@@ -423,7 +423,8 @@ public final class Main {
             // do something with pipeline results
             // System.out.println("pipeline");
             //ntinst.getTable("Vision").getEntry("TEST").setNumber(pipeline.val);
-            ntinst.getTable("Vision").getEntry("TEST").setNumber(pipeline.tags.get(0));
+            //ntinst.getTable("Vision").getEntry("TEST").setNumber(pipeline.tags.get(0));
+            ntinst.getTable("Vision").getEntry("TEST").setNumber(5);
             rawOutputStream.putFrame(pipeline.input_mat);
             outputStream.putFrame(pipeline.proc_mat);
             aprilStream.putFrame(pipeline.april_mat);
