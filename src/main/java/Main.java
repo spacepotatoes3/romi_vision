@@ -305,6 +305,7 @@ public final class Main {
     public ArrayList<Long> tags = new ArrayList<>();
     public Scalar outlineColor = new Scalar(0, 255, 0);
     public Scalar crossColor = new Scalar(0, 0, 255);
+    public boolean tagDetected;
 
     private static AprilTagDetector initializeDetector() {
       AprilTagDetector myDetector = new AprilTagDetector();
@@ -315,6 +316,9 @@ public final class Main {
 
     @Override
     public void process(Mat mat) {
+
+     tagDetected = false;
+
       val += 1;
       if (input_mat == null) {
         input_mat = mat.clone();
@@ -335,6 +339,8 @@ public final class Main {
       for (AprilTagDetection detection : detections) {
         // remember we saw this tag
         tags.add((long) detection.getId());
+
+        tagDetected = true;
 
         // draw lines around the tag
         for (var i = 0; i <= 3; i++) {
@@ -422,9 +428,17 @@ public final class Main {
           new MyPipeline(), pipeline -> {
             // do something with pipeline results
             // System.out.println("pipeline");
-            //ntinst.getTable("Vision").getEntry("TEST").setNumber(pipeline.val);
-            //ntinst.getTable("Vision").getEntry("TEST").setNumber(pipeline.tags.get(0));
-            ntinst.getTable("Vision").getEntry("TEST").setNumber(5);
+            ntinst.getTable("Vision").getEntry("TEST").setNumber(pipeline.val);
+            ntinst.getTable("Vision").getEntry("number of tags detected").setNumber(pipeline.tags.size());
+
+            if (pipeline.tagDetected) {
+            ntinst.getTable("Vision").getEntry("tagID").setNumber(pipeline.tags.get(0));
+            ntinst.getTable("Vision").getEntry("tagDetected").setBoolean(true);
+            } else {
+              ntinst.getTable("Vision").getEntry("tagID").setNumber(0);
+              ntinst.getTable("Vision").getEntry("tagDetected").setBoolean(false);
+            }
+            
             rawOutputStream.putFrame(pipeline.input_mat);
             outputStream.putFrame(pipeline.proc_mat);
             aprilStream.putFrame(pipeline.april_mat);
