@@ -1,3 +1,10 @@
+Modified java vision example downloaded from romi raspberry pi image
+
+- Modified the open CV pipeline to detect apriltags
+- Writes raw and annotated frames from the vision coprocessor to Shuffleboard
+- Writes apriltag values from the vision coprecessor to NetworkTables
+
+
 ===================
 Building on desktop
 ===================
