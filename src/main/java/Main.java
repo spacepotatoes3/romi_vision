@@ -26,6 +26,7 @@ import edu.wpi.first.cscore.CvSource;
 import edu.wpi.first.cscore.MjpegServer;
 import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.cscore.VideoSource;
+import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEvent;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.vision.VisionPipeline;
@@ -421,22 +422,22 @@ public final class Main {
     CvSource rawOutputStream = CameraServer.putVideo("Feed", 640, 480);
     CvSource outputStream = CameraServer.putVideo("Rectangle", 640, 480);
     CvSource aprilStream = CameraServer.putVideo("Aprilcodes", 640, 480);
+    NetworkTable visionTable = ntinst.getTable("Vision");
 
     // start image processing on camera 0 if present
     if (cameras.size() >= 1) {
       VisionThread visionThread = new VisionThread(cameras.get(0),
           new MyPipeline(), pipeline -> {
-            // do something with pipeline results
-            // System.out.println("pipeline");
-            ntinst.getTable("Vision").getEntry("TEST").setNumber(pipeline.val);
-            ntinst.getTable("Vision").getEntry("number of tags detected").setNumber(pipeline.tags.size());
+            // Edits NetworkTable entries
+            visionTable.getEntry("TEST").setNumber(pipeline.val);
+            visionTable.getEntry("number of tags detected").setNumber(pipeline.tags.size());
 
             if (pipeline.tagDetected) {
-            ntinst.getTable("Vision").getEntry("tagID").setNumber(pipeline.tags.get(0));
-            ntinst.getTable("Vision").getEntry("tagDetected").setBoolean(true);
+            visionTable.getEntry("tagID").setNumber(pipeline.tags.get(0));
+            visionTable.getEntry("tagDetected").setBoolean(true);
             } else {
-              ntinst.getTable("Vision").getEntry("tagID").setNumber(0);
-              ntinst.getTable("Vision").getEntry("tagDetected").setBoolean(false);
+              visionTable.getEntry("tagID").setNumber(0);
+              visionTable.getEntry("tagDetected").setBoolean(false);
             }
             
             rawOutputStream.putFrame(pipeline.input_mat);
