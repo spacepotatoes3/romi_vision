@@ -307,6 +307,9 @@ public final class Main {
     public Scalar outlineColor = new Scalar(0, 255, 0);
     public Scalar crossColor = new Scalar(0, 0, 255);
     public boolean tagDetected;
+    public static double distanceX;
+    public static double distanceY;
+    public static double distance;
 
     private static AprilTagDetector initializeDetector() {
       AprilTagDetector myDetector = new AprilTagDetector();
@@ -349,6 +352,11 @@ public final class Main {
           var pt1 = new Point(detection.getCornerX(i), detection.getCornerY(i));
           var pt2 = new Point(detection.getCornerX(j), detection.getCornerY(j));
           Imgproc.line(april_mat, pt1, pt2, outlineColor, 2);
+          if (i == 0) {
+            distanceX = Math.abs(pt1.x - pt2.x);
+            distanceY = Math.abs(pt1.y - pt2.y);
+            distance = Math.sqrt(distanceX + distanceY);
+          }
         }
 
         // mark the center of the tag
@@ -425,12 +433,15 @@ public final class Main {
     NetworkTable visionTable = ntinst.getTable("Vision");
 
     // start image processing on camera 0 if present
-    if (cameras.size() >= 1) {
+    if (!cameras.isEmpty()) {
       VisionThread visionThread = new VisionThread(cameras.get(0),
           new MyPipeline(), pipeline -> {
             // Edits NetworkTable entries
             visionTable.getEntry("TEST").setNumber(pipeline.val);
             visionTable.getEntry("number of tags detected").setNumber(pipeline.tags.size());
+            visionTable.getEntry("tagWidth").setNumber(MyPipeline.distanceX);
+            visionTable.getEntry("tagLength").setNumber(MyPipeline.distanceY);
+            visionTable.getEntry("tagDistance").setNumber(MyPipeline.distance);
 
             if (pipeline.tagDetected) {
             visionTable.getEntry("tagID").setNumber(pipeline.tags.get(0));
@@ -441,7 +452,7 @@ public final class Main {
             }
             
             rawOutputStream.putFrame(pipeline.input_mat);
-            outputStream.putFrame(pipeline.proc_mat);
+            outputStream.putFrame(pipeline.proc_mat); 
             aprilStream.putFrame(pipeline.april_mat);
           });
       /*
