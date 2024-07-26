@@ -353,9 +353,10 @@ public final class Main {
           var pt2 = new Point(detection.getCornerX(j), detection.getCornerY(j));
           Imgproc.line(april_mat, pt1, pt2, outlineColor, 2);
           if (i == 0) {
-            distanceX = Math.abs(pt1.x - pt2.x);
-            distanceY = Math.abs(pt1.y - pt2.y);
+            distanceX = Math.pow((pt1.x - pt2.x), 2);
+            distanceY = Math.pow((pt1.y - pt2.y), 2);
             distance = Math.sqrt(distanceX + distanceY);
+            Imgproc.line(april_mat, pt1, pt2, crossColor, 3);
           }
         }
 
